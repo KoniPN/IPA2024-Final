@@ -28,9 +28,9 @@ ACCESS_TOKEN = os.environ.get("WEBEX_ACCESS_TOKEN")
 # 3. Prepare parameters get the latest message for messages API.
 
 # Defines a variable that will hold the roomId
-# You need to replace this with your actual IPA2024 Webex Teams room ID
+# IPA2025 Webex Teams room ID
 roomIdToGetMessages = (
-    "bd087310-6c26-11f0-a51c-793d36f6c3ff"
+    "Y2lzY29zcGFyazovL3VybjpURUFNOnVzLXdlc3QtMl9yL1JPT00vYmQwODczMTAtNmMyNi0xMWYwLWE1MWMtNzkzZDM2ZjZjM2Zm"
 )
 
 # Change this to your student ID
