@@ -10,6 +10,7 @@ import requests
 import json
 import time
 import os
+from dotenv import load_dotenv
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import restconf_final
 # import netmiko_final
@@ -17,6 +18,9 @@ import restconf_final
 
 #######################################################################################
 # 2. Assign the Webex access token to the variable ACCESS_TOKEN using environment variables.
+
+# Load environment variables from .env file
+load_dotenv()
 
 ACCESS_TOKEN = os.environ.get("WEBEX_ACCESS_TOKEN")
 
