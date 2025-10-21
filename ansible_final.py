@@ -4,12 +4,26 @@ import glob
 
 def showrun():
     # read https://www.datacamp.com/tutorial/python-subprocess to learn more about subprocess
-    command = ['ansible-playbook', 'backup_config.yaml']
-    result = subprocess.run(command, capture_output=True, text=True)
-    result_output = result.stdout
+    # Get the absolute path to the ansible-playbook in virtual environment
+    venv_ansible = os.path.join(os.path.dirname(__file__), 'venv', 'bin', 'ansible-playbook')
+    
+    # Use the virtual environment's ansible-playbook if it exists, otherwise use system ansible-playbook
+    if os.path.exists(venv_ansible):
+        command = [venv_ansible, 'backup_config.yaml']
+    else:
+        command = ['ansible-playbook', 'backup_config.yaml']
+    
+    # Change to the script directory to ensure relative paths work
+    script_dir = os.path.dirname(__file__)
+    
+    result = subprocess.run(command, capture_output=True, text=True, cwd=script_dir)
+    result_output = result.stdout + result.stderr
+    
+    print("Ansible output:")
+    print(result_output)
     
     if 'failed=0' in result_output and 'ok=' in result_output:
-        pattern = "show_run_66070136_*.txt"
+        pattern = os.path.join(script_dir, "show_run_66070136_*.txt")
         files = glob.glob(pattern)
         if files:
             return 'ok'
