@@ -13,8 +13,9 @@ import os
 from dotenv import load_dotenv
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import restconf_final
-# import netmiko_final
-# import ansible_final
+import netmiko_final
+import ansible_final
+import glob
 
 #######################################################################################
 # 2. Assign the Webex access token to the variable ACCESS_TOKEN using environment variables.
@@ -99,11 +100,9 @@ while True:
         elif command == "status":
             responseMessage = restconf_final.status()
         elif command == "gigabit_status":
-            # Part 2 - to be implemented
-            responseMessage = "gigabit_status command not implemented yet"
+            responseMessage = netmiko_final.gigabit_status()
         elif command == "showrun":
-            # Part 2 - to be implemented
-            responseMessage = "showrun command not implemented yet"
+            responseMessage = ansible_final.showrun()
         else:
             responseMessage = "Error: No command or unknown command"
         
@@ -122,19 +121,28 @@ while True:
         # https://developer.webex.com/docs/basics for more detail
 
         if command == "showrun" and responseMessage == 'ok':
-            filename = f"show_run_{STUDENT_ID}_router.txt"
-            fileobject = open(filename, 'rb')
-            filetype = "text/plain"
-            postData = {
-                "roomId": roomIdToGetMessages,
-                "text": "show running config",
-                "files": (filename, fileobject, filetype),
-            }
-            postData = MultipartEncoder(postData)
-            HTTPHeaders = {
-            "Authorization": "Bearer " + ACCESS_TOKEN,
-            "Content-Type": postData.content_type,
-            }
+            # Find the generated file
+            pattern = f"show_run_{STUDENT_ID}_*.txt"
+            files = glob.glob(pattern)
+            if files:
+                filename = files[0]  # Get the first matching file
+                fileobject = open(filename, 'rb')
+                filetype = "text/plain"
+                postData = {
+                    "roomId": roomIdToGetMessages,
+                    "text": "show running config",
+                    "files": (filename, fileobject, filetype),
+                }
+                postData = MultipartEncoder(postData)
+                HTTPHeaders = {
+                    "Authorization": "Bearer " + ACCESS_TOKEN,
+                    "Content-Type": postData.content_type,
+                }
+            else:
+                # File not found, send error message
+                postData = {"roomId": roomIdToGetMessages, "text": "Error: Config file not found"}
+                postData = json.dumps(postData)
+                HTTPHeaders = {"Authorization": "Bearer " + ACCESS_TOKEN, "Content-Type": "application/json"}
         # other commands only send text, or no attached file.
         else:
             postData = {"roomId": roomIdToGetMessages, "text": responseMessage}
